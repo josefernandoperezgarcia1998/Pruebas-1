@@ -9,7 +9,7 @@ class Usuario extends Authenticatable
 
 {
     public $timestamps = false;
-    protected $fillable = ['nombre','a_paterno','a_materno','imagen','rol','activo','password'];
+    protected $fillable = ['nombre','a_paterno','a_materno','imagen','email','rol','activo','password'];
 
     public function preguntas_sin(){
         return DB::table('preguntas')->whereNotNull('p_autorizada')

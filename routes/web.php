@@ -43,3 +43,4 @@ Route::put('_Usuarios/{id}','AjaxControler@updateUsuario');
 Route::post('_Categorias','AjaxControler@storeCategoria');
 Route::delete('_Categorias/{id}','AjaxControler@destroyCategoria');
 
+Route::post('/register/check','AprobarController@check')->name('register.check');
