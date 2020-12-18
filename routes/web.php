@@ -1,5 +1,7 @@
 <?php
 use Illuminate\Support\Facades\Route;
+//use Illuminate\Support\Facades\Auth;
+use App\Models\Categoria;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -10,30 +12,15 @@ use Illuminate\Support\Facades\Route;
 | contains the "web" middleware group. Now create something great!
 |
 */
-Route::get('/', function () {
-    $categorias = [1=>'Electronica', 2=>'Electrodomesticos',3=>'Ropa'];
-
-    return view('welcome',compact('categorias') );
-});
-Route::get('autenticar', function() {
-    return view('autenticar'); 
-    //buscara el archivo 'autenticar.php' o 'autenticar.blade.php' dentro de resoureces/views
-});
-Route::get('tablero', function() {
-    return view('supervisor.tablero'); 
-    //buscara el archivo 'tablero.php' o 'tablero.blade.php' dentro de resoureces/views/supervisor
-});
-Route::get('revisar', function() {
-    return view('encargado.revisar'); 
-});
-Route::get('cuenta', function() {
-    return view('cliente.cuenta'); 
-});
+Route::get('/','IncioControler@index');
+Route::get('tablero','IncioControler@tablero');
+Route::get('salir'        , 'AutenticarControler@salir');
+Route::get('autenticar'        , 'AutenticarControler@autenticar');
+Route::get('registrar'        , 'AutenticarControler@registrar');
+Route::post('agregar'        , 'AutenticarControler@agregar');
 Route::post('validar'        , 'AutenticarControler@validar');
-Route::get('listar_por_categoria/{categoria_id}','BuscarControler@listar_por');
-
-
-
+Route::get('listar_por_categoria/{categoria_id}','ExploracionControler@listar_por');
+Route::post('busqueda','ExploracionControler@busqueda');
 Route::get('Categorias','CategoriasControler@index');
 Route::post('Categorias','CategoriasControler@store');
 Route::get('Categorias/create','CategoriasControler@create');
@@ -41,12 +28,18 @@ Route::get('Categorias/{categoria}','CategoriasControler@show');
 Route::put('Categorias/{categoria}','CategoriasControler@update');
 Route::delete('Categorias/{categoria}','CategoriasControler@destroy');
 Route::get('Categorias/{categoria}/edit','CategoriasControler@edit');
-//Route::resource('Categorias','CategoriasControler');
-
 Route::resource('Usuarios','UsuariosControler');
+Route::resource('Productos','ProductosControler');
+Route::resource('Revisiones', 'RevisarControler', [
+    'only' => ['index', 'show', 'update']
+]);
+Route::resource('Preguntas', 'PreguntasControler', [
+    'except' => [ 'create' ]
+]);
+Route::get('Preguntar/{producto}','PreguntasControler@create');
 
-
-
-
-
+//rutas para llamar por ajax
+Route::put('_Usuarios/{id}','AjaxControler@updateUsuario');
+Route::post('_Categorias','AjaxControler@storeCategoria');
+Route::delete('_Categorias/{id}','AjaxControler@destroyCategoria');
 

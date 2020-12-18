@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 
+use App\Models\Categoria;
+
 class CategoriasControler extends Controller
 {
     /**
@@ -13,7 +15,8 @@ class CategoriasControler extends Controller
      */
     public function index()
     {
-        return view('supervisor.Categorias.index');
+        $categorias = Categoria::all();
+        return view('Categorias.index',compact('categorias'));
     }
 
     /**
@@ -23,7 +26,7 @@ class CategoriasControler extends Controller
      */
     public function create()
     {
-        return view('supervisor.Categorias.create');
+        return view('Categorias.create');
     }
 
     /**
@@ -34,7 +37,21 @@ class CategoriasControler extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $valores = $request->all();
+        $imagen = $request->file('imagen');
+        if(!is_null($imagen)){
+            $ruta_destino = public_path('secciones/');
+            $nombre_de_archivo = $imagen->getClientOriginalName();
+            $imagen->move($ruta_destino, $nombre_de_archivo);        
+            $valores['imagen']=$nombre_de_archivo;
+        }
+
+        $registro = new Categoria();
+        $registro->fill($valores);
+        $registro->save();
+
+        return redirect("/Categorias")->with('mensaje','Categoria agregada correctamente');
+
     }
 
     /**
@@ -45,21 +62,8 @@ class CategoriasControler extends Controller
      */
     public function show($id)
     {
-        switch ($id) {
-            case '1':
-                $seccion = "electrónica";
-                break;
-            case '2':
-                $seccion = "electrodomesticos";
-                break;
-            case '3':
-                $seccion = "ropa";
-                break;
-            default:
-                return "Error::::";
-                break;
-        }
-        return view('supervisor.Categorias.show',compact('seccion'));
+        $categoria = Categoria::find($id);
+        return view('Categorias.show',compact('categoria'));
     }
 
     /**
@@ -70,21 +74,8 @@ class CategoriasControler extends Controller
      */
     public function edit($id)
     {
-        switch ($id) {
-            case '1':
-                $seccion = "electrónica";
-                break;
-            case '2':
-                $seccion = "electrodomesticos";
-                break;
-            case '3':
-                $seccion = "ropa";
-                break;
-            default:
-                return "Error::::";
-                break;
-        }
-        return view('supervisor.Categorias.edit',compact('seccion'));
+        $categoria = Categoria::find($id);
+        return view('Categorias.edit',compact('categoria'));
     }
 
     /**
@@ -96,7 +87,23 @@ class CategoriasControler extends Controller
      */
     public function update(Request $request, $id)
     {
-        //
+        $valores = $request->all();
+        //var_dump($valores);
+        //exit;
+        $imagen = $request->file('imagen');
+        if(!is_null($imagen)){
+            $ruta_destino = public_path('secciones/');
+            $nombre_de_archivo = $imagen->getClientOriginalName();
+            $imagen->move($ruta_destino, $nombre_de_archivo);        
+            $valores['imagen']=$nombre_de_archivo;
+        }
+
+        $registro = Categoria::find($id);
+        $registro->fill($valores);
+        $registro->save();
+
+        return redirect("/Categorias")->with('mensaje','Categoria modificada correctamente');
+        
     }
 
     /**
@@ -107,6 +114,13 @@ class CategoriasControler extends Controller
      */
     public function destroy($id)
     {
-        //
+        try {
+            $registro = Categoria::find($id);
+            $registro->delete();
+            return redirect("/Categorias")->with('mensaje','Categoria modificada correctamente');
+        }catch (\Illuminate\Database\QueryException $e) {
+            return redirect("/Categorias")->with('error',$e->getMessage());
+        }
+
     }
 }

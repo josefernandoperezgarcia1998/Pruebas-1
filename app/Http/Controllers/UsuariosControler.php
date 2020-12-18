@@ -24,7 +24,7 @@ class UsuariosControler extends Controller
         /*Aqui podemos hacer algunas cosas, como seleccionar que usuarios son los que cumplen cierta 
         condicion y los listaremos por ejemplo*/
 
-        return view('supervisor.Usuarios.index',compact('usuarios'));
+        return view('Usuarios.index',compact('usuarios'));
     }
 
 
@@ -35,7 +35,7 @@ class UsuariosControler extends Controller
      */
     public function create()
     {
-        return view('supervisor.Usuarios.create');
+        return view('Usuarios.create');
     }
 
     /**
@@ -51,11 +51,13 @@ class UsuariosControler extends Controller
             return redirect()->back()->with('error','El password no esta bien confirmado');
 
         $imagen = $request->file('imagen');
-        $ruta_destino = public_path('fotos/');
-        $nombre_de_archivo = $imagen->getClientOriginalName();
-        $imagen->move($ruta_destino, $nombre_de_archivo);    
+        if(!is_null($imagen)){
+            $ruta_destino = public_path('fotos/');
+            $nombre_de_archivo = $imagen->getClientOriginalName();
+            $imagen->move($ruta_destino, $nombre_de_archivo);        
+            $valores['imagen']=$nombre_de_archivo;
+        }
 
-        $valores['imagen']=$nombre_de_archivo;
         $valores['password']=Hash::make( $valores['password'] );
 
         $registro = new Usuario();
@@ -75,7 +77,7 @@ class UsuariosControler extends Controller
     public function show($id)
     {
         $usuario = Usuario::find($id);
-        return view('supervisor.Usuarios.show',compact('usuario'));
+        return view('Usuarios.show',compact('usuario'));
     }
 
     /**
@@ -87,7 +89,7 @@ class UsuariosControler extends Controller
     public function edit($id)
     {
         $usuario = Usuario::find($id);
-        return view('supervisor.Usuarios.edit',compact('usuario'));
+        return view('Usuarios.edit',compact('usuario'));
     }
 
     /**
@@ -100,12 +102,15 @@ class UsuariosControler extends Controller
     public function update(Request $request, $id)
     {
         $valores = $request->all();
-        if ($valores['password']!=$valores['password2'])
-            return redirect()->back()->with('error','El password no esta bien confirmado');
+
+        if(isset($valores['password2']))
+            if ($valores['password']!=$valores['password2'])
+                return redirect()->back()->with('error','El password no esta bien confirmado');
     
 
+        if(isset($valores['password']))
         //si el password esta en blanco no lo actualizaremos
-        if(is_null($valores['password']))
+        if( is_null($valores['password']))
             unset($valores['password']);
         else
             $valores['password']=Hash::make( $valores['password'] );
